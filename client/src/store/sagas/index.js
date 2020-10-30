@@ -1,9 +1,10 @@
 import { call, all, put, takeEvery, takeLatest } from "redux-saga/effects";
 import {loadListSucceed, loadListFailed} from '../actions';
+import {BACKEND_URL} from '../../common/Constants';
 
 const getList = (page)=>{
   console.log("page : ", page);
-  return fetch('http://localhost:8000/data?page=' + page)
+  return fetch(`${BACKEND_URL}/data?page=${page}`)
     .then(response => response.json())
     .then(myJson => myJson);
 }

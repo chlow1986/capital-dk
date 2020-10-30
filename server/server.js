@@ -1,6 +1,7 @@
 'use strict';
 
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -10,6 +11,7 @@ const Controller = require('./src/controllers');
 
 const PORT = 8000;
 const HOST = '0.0.0.0';
+const CLIENT_BUILD_PATH = path.join(__dirname, '../client/build');
 
 (async ()=>{
   const app = express();
@@ -17,15 +19,12 @@ const HOST = '0.0.0.0';
   app.use(bodyParser.json());
   app.use(cookieParser());
   app.use(cors());
+  app.use(express.static(CLIENT_BUILD_PATH));
 
   const sequelize = new SequelizeModel();
   await sequelize.connect();
 
   const controller = new Controller(sequelize.database, {});
-
-  app.get('/', (req, res)=>{
-    res.send('hello world.');
-  })
 
   app.post('/generate', (req, res)=>{
     controller.generateData(req, res);
@@ -57,6 +56,10 @@ const HOST = '0.0.0.0';
       res.send({error: err.message});
     }    
   });
+
+  app.get('*', (req, res)=>{
+    res.sendFile(path.join(CLIENT_BUILD_PATH, 'index.html'));
+  })
 
   app.listen(PORT, HOST);
 })()
